@@ -43,7 +43,7 @@ const app2 = http.createServer(async (req, res) => {
         res.end(JSON.stringify(tracks, null, 2));
         
       });
-  } else if (req.url === "/") {
+  } else {
     fs.readFile("src/views/index.html", (err, data) => {
       if (err) {
         res.statusCode = 500;
@@ -55,10 +55,6 @@ const app2 = http.createServer(async (req, res) => {
         res.end(data);
       }
     });
-  } else {
-    res.statusCode = 404;
-    res.setHeader("Content-Type", "text/plain");
-    res.end("Not Found");
   }
 });
 
