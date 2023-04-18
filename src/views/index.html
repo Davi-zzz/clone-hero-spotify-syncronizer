@@ -1,0 +1,22 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>My App</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <form method="post" action="/form">
+        <h2>Paste your spotify playlist link</h2>
+        <div class="mb-3">
+          <label for="spl" class="form-label">Spotify Playlist link</label>
+          <input name="data" type="text" class="form-control" id="spl" placeholder="...">
+        </div>
+        <button type="submit" class="btn btn-primary">OK</button>
+      </form>
+    </div>
+  </body>
+</html>
