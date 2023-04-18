@@ -1,0 +1,25 @@
+{
+  "name": "cloneherodownloader",
+  "version": "1.0.0",
+  "description": ".",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@types/express": "^4.17.17",
+    "@types/opn": "^5.5.0",
+    "boostrap": "^2.0.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "opn": "^6.0.0",
+    "typescript": "^5.0.4"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "axios": "^1.3.5",
+    "ts-node-dev": "^2.0.0"
+  },
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "watch": "ts-node-dev --respawn src/index.ts"
+  }
+}
