@@ -23,7 +23,7 @@ const config: AxiosRequestConfig = {
 };
 
 const app2 = http.createServer(async (req, res) => {
-   const request = await axios.post('https://accounts.spotify.com/api/token', config);
+   const request = await axios.post('https://accounts.spotify.com/api/token', config.params, config );
    const token = request.data['access_token'];
 
    if (req.method === 'POST' && req.url === '/form') {
