@@ -1,10 +1,11 @@
 import dotenv from 'dotenv';
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import http from 'http';
 import fs from 'fs';
 import bodyParser from 'body-parser';
+import { SpotifyResponse, Track } from './types';
 
-var opn = require('opn');
+var opn = require('better-opn');
 dotenv.config();
 
 const port = process.env.PORT || 3000;
@@ -23,7 +24,7 @@ const config: AxiosRequestConfig = {
 };
 
 const app2 = http.createServer(async (req, res) => {
-   const request = await axios.post('https://accounts.spotify.com/api/token', config.params, config );
+   const request = await axios.post('https://accounts.spotify.com/api/token', config.params, config);
    const token = request.data['access_token'];
 
    if (req.method === 'POST' && req.url === '/form') {
@@ -32,19 +33,29 @@ const app2 = http.createServer(async (req, res) => {
          // sample playlist
          // https://open.spotify.com/playlist/5mJg0V5mNVsiw9Hvl1ik69?si=8872a08a3d514a91
          var splId = `${req.body.data.match(/playlist\/(.+)\?si=/)[1]}`;
+         var tracks = [];
 
-         var spotifyResponse = await axios.get(`https://api.spotify.com/v1/playlists/${splId}`, {
+         var spotifyResponse = await axios.get<SpotifyResponse>(`https://api.spotify.com/v1/playlists/${splId}/tracks?offset=0&limit=100`, {
             headers: { Authorization: `Bearer ${token}` },
          });
 
-         //@ts-ignore
-         var tracks = spotifyResponse.data['tracks']['items'].map(({ track }) => {
-            return {
-               name: track['name'],
-               artists: track['artists'][0]['name'],
-            };
-         });
-         console.log(tracks);
+         var nextPage = spotifyResponse.data?.next;
+
+         while (nextPage) {
+            //@ts-ignore
+            tracks.push(
+               ...spotifyResponse.data['items'].map(({ track }) => {
+                  return {
+                     name: track['name'],
+                     artists: track['artists'][0]['name'],
+                  };
+               }),
+            );
+            spotifyResponse = await axios.get<SpotifyResponse>(nextPage, {
+               headers: { Authorization: `Bearer ${token}` },
+            });
+            nextPage = spotifyResponse.data?.next;
+         }
 
          res.statusCode = 200;
          res.setHeader('Content-Type', 'application/json');
@@ -67,5 +78,6 @@ const app2 = http.createServer(async (req, res) => {
 
 app2.listen(port, () => {
    console.log(`Server listening on http://localhost:${port}`);
-   opn(`http://localhost:${port}`);
+
+   opn(`http://localhost:${port}/`);
 });
