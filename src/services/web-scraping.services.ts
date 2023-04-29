@@ -1,9 +1,18 @@
-const puppeteer = require('puppeteer-core');
-const fs = require('fs');
+import puppeteer from 'puppeteer-core';
+import fs from 'fs';
 
-// Versão do chrome: 112.0.5615.138
+interface SpotifySong {
+  name: string;
+  artists: string;
+}
+
+interface Song {
+  name: string;
+  artists: string;
+}
+
 (async () => {
-  const browser = await puppeteer.launch({ executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', headless: false });
+  const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
   await page.goto('https://chorus.fightthe.pw/');
 
@@ -12,16 +21,16 @@ const fs = require('fs');
   const searchButton = 'button.SearchInput__button';
 
   // Lendo a lista de músicas da playlist do Spotify
-  const spotifyList = JSON.parse(fs.readFileSync('spotify_playlist.json'));
+  const spotifyList: SpotifySong[] = JSON.parse(fs.readFileSync('spotify_playlist.json', 'utf-8'));
 
   // Lista final de músicas em comum
-  const commonSongs = [];
+  const commonSongs: Song[] = [];
 
   for (let spotifySong of spotifyList) {
     try {
       // Ação de pesquisa
       await page.click(searchBarSelector);
-      await page.$eval(searchBarSelector, el => el.value = '');
+      await page.$eval(searchBarSelector, (el: HTMLInputElement) => (el.value = ''));
       await page.type(searchBarSelector, `${spotifySong.name} ${spotifySong.artists}`);
       await page.click(searchButton);
 
@@ -32,11 +41,11 @@ const fs = require('fs');
       // Infos da pesquisa
       const songs = await page.$$('div.Song__title');
 
-      const songList = [];
+      const songList: Song[] = [];
 
       for (let song of songs) {
-        const name = await song.$eval('b.Song__name', el => el.innerText);
-        const artists = await song.$eval('span.Song__artist', el => el.innerText);
+        const name = await song.$eval('b.Song__name', (el) => el.innerText);
+        const artists = await song.$eval('span.Song__artist', (el) => el.innerText);
 
         songList.push({ name, artists });
       }
