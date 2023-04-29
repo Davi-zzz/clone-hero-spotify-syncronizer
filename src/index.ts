@@ -12,18 +12,19 @@ const client_id = process.env.CLIENT_ID || 'there_is_no_id';
 const client_secret = process.env.CLIENT_SECRET || 'there_is_no_secret';
 
 const config: AxiosRequestConfig = {
-   headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-   },
-   params: {
+   data: {
       grant_type: 'client_credentials',
       client_id,
       client_secret,
    },
+   headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+   },
 };
 
 const app2 = http.createServer(async (req, res) => {
-   const request = await axios.post('https://accounts.spotify.com/api/token', config);
+   const request = await axios.post('https://accounts.spotify.com/api/token', config.data, config);
+
    const token = request.data['access_token'];
 
    if (req.method === 'POST' && req.url === '/form') {
@@ -44,7 +45,9 @@ const app2 = http.createServer(async (req, res) => {
                artists: track['artists'][0]['name'],
             };
          });
-         console.log(tracks);
+
+         if (!fs.existsSync('./songlist-files')) fs.mkdirSync('./songlist-files');
+         fs.writeFileSync(`songlist-files/spotify-tracks-${splId}.json`, JSON.stringify(tracks), { encoding: 'utf-8', flag: 'w' });
 
          res.statusCode = 200;
          res.setHeader('Content-Type', 'application/json');
