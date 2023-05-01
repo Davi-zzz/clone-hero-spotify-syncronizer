@@ -11,9 +11,10 @@ interface Song {
   artists: string;
 }
 
-(async () => {
-  const browser = await puppeteer.launch({ headless: false });
+export async function webScraping(playlist: string, execPath: string) {
+  const browser = await puppeteer.launch({ headless: false, executablePath: execPath});
   const page = await browser.newPage();
+
   await page.goto('https://chorus.fightthe.pw/');
 
   // Mapeando...
@@ -21,7 +22,7 @@ interface Song {
   const searchButton = 'button.SearchInput__button';
 
   // Lendo a lista de músicas da playlist do Spotify
-  const spotifyList: SpotifySong[] = JSON.parse(fs.readFileSync('spotify_playlist.json', 'utf-8'));
+  const spotifyList: SpotifySong[] = JSON.parse(fs.readFileSync(playlist, 'utf-8'));
 
   // Lista final de músicas em comum
   const commonSongs: Song[] = [];
@@ -46,6 +47,8 @@ interface Song {
       for (let song of songs) {
         const name = await song.$eval('b.Song__name', (el) => el.innerText);
         const artists = await song.$eval('span.Song__artist', (el) => el.innerText);
+        await page.click('div.DownloadLink--verified.a');
+
 
         songList.push({ name, artists });
       }
@@ -66,4 +69,4 @@ interface Song {
   console.log(JSON.stringify(commonSongs, null, 2));
 
   // await browser.close();
-})();
+}
