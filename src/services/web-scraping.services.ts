@@ -37,17 +37,25 @@ export async function webScraping(playlist: string, execPath: string) {
 
       // Espera pelos resultados antes de sair criando json
       // Se não achar em menos de 3seg ele parte pra próxima música
-      await page.waitForSelector('div.Song__title', { timeout: 1500 });
+      await page.waitForSelector('div.Song__title', { timeout: 3000 });
 
       // Infos da pesquisa
       const songs = await page.$$('div.Song__title');
 
+      //  Download
+      const downloadLink = await page.waitForSelector('div.DownloadLink', { timeout: 3000 })
+      const link = await downloadLink?.$eval('a', (element) => element.href)
+      if (link) {
+        await page.goto(link)
+      } else {
+        console.log('Link de download não encontrado')
+      }
+      
       const songList: Song[] = [];
 
       for (let song of songs) {
         const name = await song.$eval('b.Song__name', (el) => el.innerText);
         const artists = await song.$eval('span.Song__artist', (el) => el.innerText);
-        await page.click('div.DownloadLink--verified.a');
 
 
         songList.push({ name, artists });
