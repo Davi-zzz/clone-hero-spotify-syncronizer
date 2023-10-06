@@ -1152,6 +1152,13 @@ puppeteer-core@19.11.1:
     unbzip2-stream "1.4.3"
     ws "8.13.0"
 
+puppeteer-select@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.npmjs.org/puppeteer-select/-/puppeteer-select-1.0.3.tgz"
+  integrity sha512-40C1d8AayuBeDC5yK6fttMQYz348lhyB8azgqZy7b8aeylLXYcJZ981aktDboOeYOOCxio/F02J2YcbAQBJYIw==
+  dependencies:
+    sizzle "^2.3.3"
+
 puppeteer@^19.11.1:
   version "19.11.1"
   resolved "https://registry.npmjs.org/puppeteer/-/puppeteer-19.11.1.tgz"
@@ -1280,6 +1287,11 @@ side-channel@^1.0.4:
     call-bind "^1.0.0"
     get-intrinsic "^1.0.2"
     object-inspect "^1.9.0"
+
+sizzle@^2.3.3:
+  version "2.3.10"
+  resolved "https://registry.npmjs.org/sizzle/-/sizzle-2.3.10.tgz"
+  integrity sha512-kPGev+SiByuzi/YPDTqCwdKLWCaN9+14ve86yH0gP6Efue04xjLYWJrcLC6y1buFyIVXkwHNXPsOTEd1MYVPbQ==
 
 source-map-support@^0.5.12:
   version "0.5.21"

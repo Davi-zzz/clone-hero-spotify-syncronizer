@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer-core';
 import fs from 'fs';
+const select = require ('puppeteer-select');
 
 interface SpotifySong {
   name: string;
@@ -12,7 +13,7 @@ interface Song {
 }
 
 export async function webScraping(playlist: string, execPath: string) {
-  const browser = await puppeteer.launch({ headless: false, executablePath: execPath});
+  const browser = await puppeteer.launch({ headless: false, executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome'});
   const page = await browser.newPage();
 
   await page.goto('https://chorus.fightthe.pw/');
@@ -43,13 +44,13 @@ export async function webScraping(playlist: string, execPath: string) {
       const songs = await page.$$('div.Song__title');
 
       //  Download
-      const downloadLink = await page.waitForSelector('div.DownloadLink', { timeout: 3000 })
-      const link = await downloadLink?.$eval('a', (element) => element.href)
-      if (link) {
-        await page.goto(link)
-      } else {
-        console.log('Link de download não encontrado')
-      }
+      // const downloadLink = await page.waitForSelector('div.DownloadLink', { timeout: 3000 })
+      // const link = await downloadLink?.$eval('a', (element) => element.href)
+      // if (link) {
+      //   await page.goto(link)
+      // } else {
+      //   console.log('Link de download não encontrado')
+      // }
       
       const songList: Song[] = [];
 
@@ -77,4 +78,40 @@ export async function webScraping(playlist: string, execPath: string) {
   console.log(JSON.stringify(commonSongs, null, 2));
 
   // await browser.close();
+
+  const page2 = await browser.newPage();
+  await page2.goto('https://chorus.fightthe.pw/');
+
+  const downloadList = commonSongs;
+
+  for (let songsDownload of downloadList) { 
+    await page2.click(searchBarSelector);
+    await page2.$eval(searchBarSelector, (el: HTMLInputElement) => (el.value = ''));
+    await page2.type(searchBarSelector, `${songsDownload.name} ${songsDownload.artists}`); 
+    await page2.click(searchButton);
+    await page2.waitForSelector('div.Song__title', { timeout: 3000 });
+    const songs = await page2.$$('div.Song__title');
+
+    // Download
+    for (let song of songs) {
+      const downloadLink = await page2.waitForSelector('div.DownloadLink, div.DownloadLink--verified', { timeout: 3000 })
+      const link: string | undefined = await downloadLink?.$eval('a', (element) => element.href)
+
+      if (link) {
+        await page2.goto(link);
+        
+        const buttonDownloadDriveSelector = 'button:contains("Fazer download de tudo")';
+        await page2.waitForSelector(buttonDownloadDriveSelector);
+        await page2.click(buttonDownloadDriveSelector)
+        
+        await page2.goBack();
+        await new Promise(resolve => setTimeout(resolve, 4000));
+      } else {
+        console.error('Link de dowload não encontrado!');
+      }
+      break;
+    }
+
+  }
+
 }
